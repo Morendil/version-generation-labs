@@ -1,0 +1,30 @@
+name: Docker Hub Workflow
+run-name: Docker Hub Workflow
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - 'main'
+
+jobs:
+  build-and-push-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: create-version-json
+        id: create-version-json
+        uses: jsdaniell/create-json@v1.2.3
+        with:
+          name: "version.json"
+          json: '{"source":"${{github.repository}}", "version":"${{github.ref_name}}", "commit":"${{github.sha}}", "build": "NA"}'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: version.json
+          path: version.json
+          retention-days: 7
